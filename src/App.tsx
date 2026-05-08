@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import CategoryFilter from "./components/CategoryFilter";
+import DogConditionFilter from "./components/DogConditionFilter";
 import MapLegend from "./components/MapLegend";
 import MapView from "./components/MapView";
 import PurposeSelector from "./components/PurposeSelector";
 import RouteCard from "./components/RouteCard";
 import SearchBox from "./components/SearchBox";
 import { pins } from "./data/pins";
-import type { PinCategory, Purpose } from "./types";
+import type {
+  DogConditionFilters,
+  DogSize,
+  PinCategory,
+  Purpose,
+} from "./types";
 import { recommendRoutes } from "./utils/routeRecommend";
 
 const ALL_CATEGORIES: PinCategory[] = [
@@ -17,6 +23,13 @@ const ALL_CATEGORIES: PinCategory[] = [
   "TOILET",
   "GROOMING",
 ];
+
+const INITIAL_DOG_FILTERS: DogConditionFilters = {
+  selectedDogSizes: [],
+  indoorOnly: false,
+  parkingOnly: false,
+  noReservationOnly: false,
+};
 
 const CATEGORY_SEARCH_TEXT: Record<PinCategory, string> = {
   CAFE: "카페 반려동물 동반 카페 애견카페 커피",
@@ -34,6 +47,8 @@ export default function App() {
   const [selectedPurpose, setSelectedPurpose] = useState<Purpose>("WALK");
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [dogFilters, setDogFilters] =
+    useState<DogConditionFilters>(INITIAL_DOG_FILTERS);
 
   const visiblePins = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -42,6 +57,29 @@ export default function App() {
       const isCategorySelected = selectedCategories.includes(pin.category);
 
       if (!isCategorySelected) {
+        return false;
+      }
+
+      if (dogFilters.selectedDogSizes.length > 0) {
+        const allowedSizes = pin.dogSizeAllowed ?? [];
+        const hasMatchingSize = dogFilters.selectedDogSizes.some((size) =>
+          allowedSizes.includes(size)
+        );
+
+        if (!hasMatchingSize) {
+          return false;
+        }
+      }
+
+      if (dogFilters.indoorOnly && !pin.indoorAllowed) {
+        return false;
+      }
+
+      if (dogFilters.parkingOnly && !pin.parkingAvailable) {
+        return false;
+      }
+
+      if (dogFilters.noReservationOnly && pin.reservationRequired) {
         return false;
       }
 
@@ -61,7 +99,7 @@ export default function App() {
 
       return searchableText.includes(normalizedQuery);
     });
-  }, [selectedCategories, searchQuery]);
+  }, [selectedCategories, searchQuery, dogFilters]);
 
   const routeOptions = useMemo(() => {
     return recommendRoutes(pins, selectedPurpose);
@@ -91,6 +129,49 @@ export default function App() {
     setSelectedCategories([]);
   };
 
+  const handleToggleDogSize = (size: DogSize) => {
+    setDogFilters((prev) => {
+      if (prev.selectedDogSizes.includes(size)) {
+        return {
+          ...prev,
+          selectedDogSizes: prev.selectedDogSizes.filter(
+            (item) => item !== size
+          ),
+        };
+      }
+
+      return {
+        ...prev,
+        selectedDogSizes: [...prev.selectedDogSizes, size],
+      };
+    });
+  };
+
+  const handleToggleIndoorOnly = () => {
+    setDogFilters((prev) => ({
+      ...prev,
+      indoorOnly: !prev.indoorOnly,
+    }));
+  };
+
+  const handleToggleParkingOnly = () => {
+    setDogFilters((prev) => ({
+      ...prev,
+      parkingOnly: !prev.parkingOnly,
+    }));
+  };
+
+  const handleToggleNoReservationOnly = () => {
+    setDogFilters((prev) => ({
+      ...prev,
+      noReservationOnly: !prev.noReservationOnly,
+    }));
+  };
+
+  const handleClearDogFilters = () => {
+    setDogFilters(INITIAL_DOG_FILTERS);
+  };
+
   return (
     <main style={{ padding: "24px", maxWidth: "1000px", margin: "0 auto" }}>
       <h1>반려견 외출 루트 추천 지도</h1>
@@ -113,6 +194,15 @@ export default function App() {
         onClearAll={handleClearAll}
       />
 
+      <DogConditionFilter
+        filters={dogFilters}
+        onToggleDogSize={handleToggleDogSize}
+        onToggleIndoorOnly={handleToggleIndoorOnly}
+        onToggleParkingOnly={handleToggleParkingOnly}
+        onToggleNoReservationOnly={handleToggleNoReservationOnly}
+        onClear={handleClearDogFilters}
+      />
+
       <MapLegend />
 
       <p style={{ color: "#6b7280", fontSize: "14px" }}>
@@ -132,8 +222,8 @@ export default function App() {
             border: "1px solid #fed7aa",
           }}
         >
-          검색 조건에 맞는 장소가 없습니다. 검색어를 줄이거나 카테고리 필터를
-          다시 확인하세요.
+          조건에 맞는 장소가 없습니다. 검색어를 줄이거나 필터 조건을 다시
+          확인하세요.
         </section>
       )}
 

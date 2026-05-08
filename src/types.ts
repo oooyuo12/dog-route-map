@@ -6,6 +6,8 @@ export type PinCategory =
   | "TOILET"
   | "GROOMING";
 
+export type DogSize = "SMALL" | "MEDIUM" | "LARGE";
+
 export type Pin = {
   id: string;
   name: string;
@@ -15,10 +17,17 @@ export type Pin = {
   description?: string;
 
   address?: string;
+
   dogFriendlyScore?: number;
   routePriorityScore?: number;
   accessibilityScore?: number;
   safetyScore?: number;
+
+  dogSizeAllowed?: DogSize[];
+  indoorAllowed?: boolean;
+  parkingAvailable?: boolean;
+  reservationRequired?: boolean;
+  leashRequired?: boolean;
 };
 
 export type Purpose =
@@ -36,4 +45,11 @@ export type RouteResult = {
   totalDistanceKm: number;
   score: number;
   description: string;
+};
+
+export type DogConditionFilters = {
+  selectedDogSizes: DogSize[];
+  indoorOnly: boolean;
+  parkingOnly: boolean;
+  noReservationOnly: boolean;
 };
