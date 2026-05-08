@@ -8,25 +8,78 @@ type MapViewProps = {
   routePins: Pin[];
 };
 
-const CATEGORY_LABEL: Record<PinCategory, string> = {
-  CAFE: "반려동물 동반 카페",
-  HOSPITAL: "동물병원",
-  PARK: "산책로·공원",
-  PET_STORE: "반려동물 용품점",
-  TOILET: "배변시설",
-  GROOMING: "미용·목욕샵",
+const CATEGORY_INFO: Record<
+  PinCategory,
+  {
+    label: string;
+    color: string;
+    emoji: string;
+  }
+> = {
+  CAFE: {
+    label: "반려동물 동반 카페",
+    color: "#8B5E3C",
+    emoji: "☕",
+  },
+  HOSPITAL: {
+    label: "동물병원",
+    color: "#E53935",
+    emoji: "🏥",
+  },
+  PARK: {
+    label: "산책로·공원",
+    color: "#43A047",
+    emoji: "🌳",
+  },
+  PET_STORE: {
+    label: "반려동물 용품점",
+    color: "#8E24AA",
+    emoji: "🛒",
+  },
+  TOILET: {
+    label: "배변시설",
+    color: "#1E88E5",
+    emoji: "🚮",
+  },
+  GROOMING: {
+    label: "미용·목욕샵",
+    color: "#D81B60",
+    emoji: "✂️",
+  },
 };
 
-const defaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+function createCategoryIcon(category: PinCategory) {
+  const info = CATEGORY_INFO[category];
+
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="
+        width: 34px;
+        height: 34px;
+        border-radius: 50% 50% 50% 0;
+        background: ${info.color};
+        transform: rotate(-45deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      ">
+        <span style="
+          transform: rotate(45deg);
+          font-size: 17px;
+          line-height: 1;
+        ">
+          ${info.emoji}
+        </span>
+      </div>
+    `,
+    iconSize: [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor: [0, -34],
+  });
+}
 
 export default function MapView({ pins, routePins }: MapViewProps) {
   const routePath: [number, number][] = routePins.map((pin) => [
@@ -50,19 +103,35 @@ export default function MapView({ pins, routePins }: MapViewProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {pins.map((pin) => (
-        <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={defaultIcon}>
-          <Popup>
-            <strong>{pin.name}</strong>
-            <br />
-            {CATEGORY_LABEL[pin.category]}
-            <br />
-            {pin.description}
-          </Popup>
-        </Marker>
-      ))}
+      {pins.map((pin) => {
+        const categoryInfo = CATEGORY_INFO[pin.category];
 
-      {routePath.length >= 2 && <Polyline positions={routePath} />}
+        return (
+          <Marker
+            key={pin.id}
+            position={[pin.lat, pin.lng]}
+            icon={createCategoryIcon(pin.category)}
+          >
+            <Popup>
+              <strong>{pin.name}</strong>
+              <br />
+              {categoryInfo.label}
+              <br />
+              {pin.description}
+            </Popup>
+          </Marker>
+        );
+      })}
+
+      {routePath.length >= 2 && (
+        <Polyline
+          positions={routePath}
+          pathOptions={{
+            weight: 5,
+            opacity: 0.8,
+          }}
+        />
+      )}
     </MapContainer>
   );
 }
