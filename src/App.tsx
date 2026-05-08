@@ -10,6 +10,7 @@ import { pins } from "./data/pins";
 import type {
   DogConditionFilters,
   DogSize,
+  Pin,
   PinCategory,
   Purpose,
 } from "./types";
@@ -40,6 +41,54 @@ const CATEGORY_SEARCH_TEXT: Record<PinCategory, string> = {
   GROOMING: "미용 목욕 미용샵 목욕샵 그루밍",
 };
 
+function matchesDogFilters(pin: Pin, filters: DogConditionFilters): boolean {
+  if (filters.selectedDogSizes.length > 0) {
+    const allowedSizes = pin.dogSizeAllowed ?? [];
+
+    const hasMatchingSize = filters.selectedDogSizes.some((size) =>
+      allowedSizes.includes(size)
+    );
+
+    if (!hasMatchingSize) {
+      return false;
+    }
+  }
+
+  if (filters.indoorOnly && !pin.indoorAllowed) {
+    return false;
+  }
+
+  if (filters.parkingOnly && !pin.parkingAvailable) {
+    return false;
+  }
+
+  if (filters.noReservationOnly && pin.reservationRequired) {
+    return false;
+  }
+
+  return true;
+}
+
+function matchesSearchQuery(pin: Pin, searchQuery: string): boolean {
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  const searchableText = [
+    pin.name,
+    pin.description ?? "",
+    pin.address ?? "",
+    pin.category,
+    CATEGORY_SEARCH_TEXT[pin.category],
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return searchableText.includes(normalizedQuery);
+}
+
 export default function App() {
   const [selectedCategories, setSelectedCategories] =
     useState<PinCategory[]>(ALL_CATEGORIES);
@@ -50,66 +99,37 @@ export default function App() {
   const [dogFilters, setDogFilters] =
     useState<DogConditionFilters>(INITIAL_DOG_FILTERS);
 
-  const visiblePins = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
+  // 추천 루트 계산에 사용할 장소
+  // 검색어와 카테고리 필터는 화면 표시용에 가깝고,
+  // 반려견 조건 필터는 실제 추천 조건으로 반영한다.
+  const routeCandidatePins = useMemo(() => {
+    return pins.filter((pin) => matchesDogFilters(pin, dogFilters));
+  }, [dogFilters]);
 
-    return pins.filter((pin) => {
+  // 지도에 실제로 표시할 장소
+  const visiblePins = useMemo(() => {
+    return routeCandidatePins.filter((pin) => {
       const isCategorySelected = selectedCategories.includes(pin.category);
 
       if (!isCategorySelected) {
         return false;
       }
 
-      if (dogFilters.selectedDogSizes.length > 0) {
-        const allowedSizes = pin.dogSizeAllowed ?? [];
-        const hasMatchingSize = dogFilters.selectedDogSizes.some((size) =>
-          allowedSizes.includes(size)
-        );
-
-        if (!hasMatchingSize) {
-          return false;
-        }
-      }
-
-      if (dogFilters.indoorOnly && !pin.indoorAllowed) {
-        return false;
-      }
-
-      if (dogFilters.parkingOnly && !pin.parkingAvailable) {
-        return false;
-      }
-
-      if (dogFilters.noReservationOnly && pin.reservationRequired) {
-        return false;
-      }
-
-      if (!normalizedQuery) {
-        return true;
-      }
-
-      const searchableText = [
-        pin.name,
-        pin.description ?? "",
-        pin.address ?? "",
-        pin.category,
-        CATEGORY_SEARCH_TEXT[pin.category],
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      return searchableText.includes(normalizedQuery);
+      return matchesSearchQuery(pin, searchQuery);
     });
-  }, [selectedCategories, searchQuery, dogFilters]);
+  }, [routeCandidatePins, selectedCategories, searchQuery]);
 
   const routeOptions = useMemo(() => {
-    return recommendRoutes(pins, selectedPurpose);
-  }, [selectedPurpose]);
+    return recommendRoutes(routeCandidatePins, selectedPurpose);
+  }, [routeCandidatePins, selectedPurpose]);
 
   const selectedRoute = routeOptions[selectedRouteIndex] ?? routeOptions[0];
 
+  const isRouteIncomplete = selectedRoute.pins.length === 0;
+
   useEffect(() => {
     setSelectedRouteIndex(0);
-  }, [selectedPurpose]);
+  }, [selectedPurpose, dogFilters]);
 
   const handleToggleCategory = (category: PinCategory) => {
     setSelectedCategories((prev) => {
@@ -177,7 +197,8 @@ export default function App() {
       <h1>반려견 외출 루트 추천 지도</h1>
 
       <p>
-        외출 목적을 선택하면 카테고리별 장소를 조합해 추천 루트를 표시합니다.
+        외출 목적과 반려견 조건을 선택하면 조건에 맞는 장소를 조합해 추천
+        루트를 표시합니다.
       </p>
 
       <PurposeSelector
@@ -205,9 +226,38 @@ export default function App() {
 
       <MapLegend />
 
-      <p style={{ color: "#6b7280", fontSize: "14px" }}>
-        현재 표시 중인 장소: <strong>{visiblePins.length}</strong>개
-      </p>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          flexWrap: "wrap",
+          margin: "12px 0",
+          color: "#111827",
+        }}
+      >
+        <span
+          style={{
+            padding: "8px 12px",
+            borderRadius: "10px",
+            background: "#f3f4f6",
+            fontWeight: 700,
+          }}
+        >
+          현재 표시 중인 장소 {visiblePins.length}개
+        </span>
+
+        <span
+          style={{
+            padding: "8px 12px",
+            borderRadius: "10px",
+            background: "#dbeafe",
+            color: "#1e40af",
+            fontWeight: 700,
+          }}
+        >
+          추천 계산 가능 장소 {routeCandidatePins.length}개
+        </span>
+      </div>
 
       <MapView pins={visiblePins} routePins={selectedRoute.pins} />
 
@@ -220,10 +270,28 @@ export default function App() {
             background: "#fff7ed",
             color: "#9a3412",
             border: "1px solid #fed7aa",
+            fontWeight: 700,
           }}
         >
           조건에 맞는 장소가 없습니다. 검색어를 줄이거나 필터 조건을 다시
           확인하세요.
+        </section>
+      )}
+
+      {isRouteIncomplete && (
+        <section
+          style={{
+            marginTop: "16px",
+            padding: "16px",
+            borderRadius: "12px",
+            background: "#fef2f2",
+            color: "#991b1b",
+            border: "1px solid #fecaca",
+            fontWeight: 700,
+          }}
+        >
+          현재 반려견 조건을 만족하는 장소가 부족해서 추천 루트를 구성할 수
+          없습니다. 조건을 완화하거나 장소 데이터를 더 추가해 주세요.
         </section>
       )}
 
