@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "convert:pins":"node scripts/convertPinsCsv.cjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
+    "papaparse": "^5.5.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-leaflet": "^5.0.0",
@@ -20,6 +22,7 @@
     "@eslint/js": "^10.0.1",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^24.12.2",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",

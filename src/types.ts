@@ -24,6 +24,9 @@ export type Pin = {
   description?: string;
 
   address?: string;
+  source?: string;
+  lastChecked?: string;
+  notes?: string;
 
   dogFriendlyScore?: number;
   routePriorityScore?: number;

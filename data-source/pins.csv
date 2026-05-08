@@ -1,0 +1,3 @@
+id,name,category,lat,lng,address,description,dogFriendlyScore,routePriorityScore,accessibilityScore,safetyScore,dogSizeAllowed,indoorAllowed,parkingAvailable,reservationRequired,leashRequired,source,lastChecked,notes
+cafe-test-001,테스트 카페,CAFE,37.4539,127.1273,경기 성남시 수정구 복정동,실내 동반 가능한 테스트 카페,4,4,5,4,SMALL|MEDIUM,TRUE,FALSE,FALSE,TRUE,네이버지도,2026-05-08,테스트 데이터
+park-test-001,테스트 공원,PARK,37.4555,127.1280,경기 성남시 수정구 복정동,산책 가능한 테스트 공원,5,5,4,5,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,현장확인,2026-05-08,테스트 데이터
