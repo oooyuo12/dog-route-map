@@ -1,3 +1,23 @@
 id,name,category,lat,lng,address,description,dogFriendlyScore,routePriorityScore,accessibilityScore,safetyScore,dogSizeAllowed,indoorAllowed,parkingAvailable,reservationRequired,leashRequired,source,lastChecked,notes
-cafe-test-001,테스트 카페,CAFE,37.4539,127.1273,경기 성남시 수정구 복정동,실내 동반 가능한 테스트 카페,4,4,5,4,SMALL|MEDIUM,TRUE,FALSE,FALSE,TRUE,네이버지도,2026-05-08,테스트 데이터
-park-test-001,테스트 공원,PARK,37.4555,127.1280,경기 성남시 수정구 복정동,산책 가능한 테스트 공원,5,5,4,5,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,현장확인,2026-05-08,테스트 데이터
+cafe-001,티코스커피,CAFE,37.4539,127.1273,경기 성남시 수정구 복정로 10,가천대 후문 근처 애견 동반 가능 카페 후보,4,4,5,4,SMALL|MEDIUM,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,운영조건 재확인 필요
+cafe-002,ban dog cafe,CAFE,37.4566,127.1284,경기 성남시 수정구 복정로 63-1 4층,복정동 애견동반 카페 후보,5,5,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,FALSE,TRUE,1차조사,2026-05-08,운영시간 재확인 필요
+cafe-003,이즈 케이크,CAFE,37.4692,127.1396,경기 성남시 수정구 위례순환로4길 20 지하1층,위례 창곡천 근처 애견동반 카페 후보,4,3,3,4,SMALL|MEDIUM,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,좌표 재확인 필요
+cafe-004,애비로드커피바,CAFE,37.4751,127.1401,경기 성남시 수정구 위례서일로1길 22 1층 103호,위례 애견동반 가능 카페 후보,4,3,3,4,SMALL|MEDIUM,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,야간 운영 여부 확인 필요
+cafe-005,위례빵집,CAFE,37.4680,127.1534,경기 성남시 수정구 위례순환로 130 아트리버상가 2단지 1층,대형견 가능 정보가 있는 위례 베이커리 카페 후보,5,4,3,4,SMALL|MEDIUM|LARGE,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,동반 조건 재확인 필요
+park-001,복정공원,PARK,37.4677109,127.1278633,경기 성남시 수정구 복정동 635,벤치와 어린이놀이터가 있는 어린이공원,3,4,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,반려견 출입 조건 확인 필요
+park-002,복우물공원,PARK,37.45551308,127.1280969,경기 성남시 수정구 복정동 697,복정동 어린이공원 및 산책 후보지,4,5,5,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,배변시설 위치 현장 확인 필요
+park-003,기왓골어린이공원,PARK,37.463782222748,127.127676501319,경기 성남시 수정구 복정로118번길 7,복정동 내 소규모 어린이공원 후보,3,3,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,혼잡도 확인 필요
+park-004,희망대공원,PARK,37.44930274,127.1501855,경기 성남시 수정구 희망로509번길 20,넓은 근린공원 및 산책 후보지,5,5,3,5,SMALL|MEDIUM|LARGE,FALSE,TRUE,FALSE,TRUE,1차조사,2026-05-08,가천대에서 거리가 있음
+park-005,탄천민물고기습지생태원,PARK,37.4497454774,127.1270219218,경기 성남시 수정구 태평동,탄천변 산책과 생태 관찰이 가능한 산책 후보지,4,5,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,산책로 접근성 확인 필요
+hospital-001,이플동물병원,HOSPITAL,37.4564,127.1286,경기 성남시 수정구 복정로 35,복정동 동물병원 후보,3,5,5,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,진료시간 재확인 필요
+hospital-002,태평역 동물병원,HOSPITAL,37.4408,127.1269,경기 성남시 수정구 성남대로 1222 예농빌딩 1층,수진동 태평역 인근 동물병원 후보,3,4,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,가천대에서 거리가 있음
+hospital-003,건국동물병원,HOSPITAL,37.4439,127.1308,경기 성남시 수정구 수정로 131,태평동 동물병원 후보,3,4,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,좌표 재확인 필요
+hospital-004,중앙동물병원,HOSPITAL,37.4444,127.1313,경기 성남시 수정구 수정로 139,태평동 동물병원 후보,4,4,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,미용 및 호텔 가능 여부 확인 필요
+hospital-005,성남 시립동물병원,HOSPITAL,37.4448,127.1287,경기 성남시 수정구 탄리로 59 수정커뮤니티센터 지하1층,수진동 수정커뮤니티센터 인근 동물병원 후보,3,4,4,4,SMALL|MEDIUM|LARGE,TRUE,TRUE,TRUE,TRUE,1차조사,2026-05-08,예약 필요 여부 확인 필요
+store-001,퍼피파라다이스,PET_STORE,37.4581,127.1277,경기 성남시 수정구 성남대로1380번길 11-2,복정동 반려동물용품 업체 후보,3,3,4,3,SMALL|MEDIUM,TRUE,FALSE,FALSE,TRUE,1차조사,2026-05-08,운영 형태 확인 필요
+store-002,비앤샵,PET_STORE,37.4560,127.1282,경기 성남시 수정구 복정동 698 1층,반려동물용품 카테고리 운영 정보가 있는 업체 후보,3,3,4,3,SMALL|MEDIUM,TRUE,FALSE,FALSE,TRUE,1차조사,2026-05-08,동반 입장 여부 확인 필요
+store-003,독샤워,PET_STORE,37.4683,127.1391,경기 성남시 수정구 위례서로 18 2층,위례 인근 반려동물용품 및 케어 관련 후보,4,3,3,4,SMALL|MEDIUM|LARGE,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,세부 서비스 확인 필요
+grooming-001,강아지이발소 견,GROOMING,37.4561,127.1285,경기 성남시 수정구 복정동 695-10,복정동 애견미용 후보,4,5,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,예약 방식 확인 필요
+grooming-002,장독 펫살롱,GROOMING,37.4755,127.1426,경기 성남시 수정구 위례광장로104 2층 2236호,위례 애견미용샵 후보,4,4,3,4,SMALL|MEDIUM,TRUE,TRUE,TRUE,TRUE,1차조사,2026-05-08,가천대에서 거리가 있음
+toilet-001,복우물공원 배변시설 후보,TOILET,37.4550,127.1287,경기 성남시 수정구 복정동 697 인근,배변봉투함 및 쓰레기통 현장 확인 필요,3,4,5,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,현장확인필요,2026-05-08,정확한 시설 위치 확인 필요
+toilet-002,탄천 산책로 배변시설 후보,TOILET,37.4497,127.1270,탄천민물고기습지생태원 인근,탄천 산책로 인근 배변 처리 후보,3,5,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,현장확인필요,2026-05-08,정확한 배변봉투함 위치 확인 필요
