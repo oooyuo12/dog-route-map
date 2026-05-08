@@ -1,5 +1,10 @@
+import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
 import L from "leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import {
   MapContainer,
   Marker,
@@ -91,6 +96,34 @@ function createCategoryIcon(category: PinCategory) {
   });
 }
 
+function createClusterCustomIcon(cluster: { getChildCount: () => number }) {
+  const count = cluster.getChildCount();
+
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #ffffff;
+        border: 4px solid #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 17px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+      ">
+        ${count}
+      </div>
+    `,
+    iconSize: [46, 46],
+    iconAnchor: [23, 23],
+  });
+}
+
 const userLocationIcon = L.divIcon({
   className: "",
   html: `
@@ -111,7 +144,9 @@ const userLocationIcon = L.divIcon({
 function MapCenterUpdater({ center }: { center: Location }) {
   const map = useMap();
 
-  map.setView([center.lat, center.lng], map.getZoom());
+  useEffect(() => {
+    map.setView([center.lat, center.lng], map.getZoom());
+  }, [center.lat, center.lng, map]);
 
   return null;
 }
@@ -161,25 +196,34 @@ export default function MapView({
         </Marker>
       )}
 
-      {pins.map((pin) => {
-        const categoryInfo = CATEGORY_INFO[pin.category];
+      <MarkerClusterGroup
+        chunkedLoading
+        iconCreateFunction={createClusterCustomIcon}
+        maxClusterRadius={45}
+        disableClusteringAtZoom={17}
+        spiderfyOnMaxZoom
+        showCoverageOnHover={false}
+      >
+        {pins.map((pin) => {
+          const categoryInfo = CATEGORY_INFO[pin.category];
 
-        return (
-          <Marker
-            key={pin.id}
-            position={[pin.lat, pin.lng]}
-            icon={createCategoryIcon(pin.category)}
-          >
-            <Popup>
-              <strong>{pin.name}</strong>
-              <br />
-              {categoryInfo.label}
-              <br />
-              {pin.description}
-            </Popup>
-          </Marker>
-        );
-      })}
+          return (
+            <Marker
+              key={pin.id}
+              position={[pin.lat, pin.lng]}
+              icon={createCategoryIcon(pin.category)}
+            >
+              <Popup>
+                <strong>{pin.name}</strong>
+                <br />
+                {categoryInfo.label}
+                <br />
+                {pin.description}
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MarkerClusterGroup>
 
       {routePath.length >= 2 && (
         <Polyline

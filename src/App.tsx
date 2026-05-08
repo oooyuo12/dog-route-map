@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CategoryFilter from "./components/CategoryFilter";
 import CurrentLocationControl from "./components/CurrentLocationControl";
 import DogConditionFilter from "./components/DogConditionFilter";
@@ -21,8 +21,8 @@ import { recommendRoutes } from "./utils/routeRecommend";
 type LocationStatus = "idle" | "loading" | "success" | "error";
 
 const DEFAULT_LOCATION: Location = {
-  lat: 37.5408,
-  lng: 127.0693,
+  lat: 37.4509,
+  lng: 127.1287,
 };
 
 const ALL_CATEGORIES: PinCategory[] = [
@@ -143,35 +143,39 @@ export default function App() {
     setSelectedRouteIndex(0);
   }, [selectedPurpose, dogFilters, userLocation]);
 
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
+  const handleUseCurrentLocation = useCallback(() => {
+  if (!navigator.geolocation) {
+    setLocationStatus("error");
+    return;
+  }
+
+  setLocationStatus("loading");
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const nextLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+
+      setUserLocation(nextLocation);
+      setMapCenter(nextLocation);
+      setLocationStatus("success");
+    },
+    () => {
       setLocationStatus("error");
-      return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000,
     }
+  );
+}, []);
 
-    setLocationStatus("loading");
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const nextLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-
-        setUserLocation(nextLocation);
-        setMapCenter(nextLocation);
-        setLocationStatus("success");
-      },
-      () => {
-        setLocationStatus("error");
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000,
-      }
-    );
-  };
+useEffect(() => {
+  handleUseCurrentLocation();
+}, [handleUseCurrentLocation]);
 
   const handleToggleCategory = (category: PinCategory) => {
     setSelectedCategories((prev) => {
