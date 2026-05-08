@@ -8,6 +8,8 @@ export type PinCategory =
 
 export type DogSize = "SMALL" | "MEDIUM" | "LARGE";
 
+export type WalkingIntensity = "가벼움" | "보통" | "긴 코스";
+
 export type Pin = {
   id: string;
   name: string;
@@ -43,6 +45,8 @@ export type RouteResult = {
   purpose: Purpose;
   pins: Pin[];
   totalDistanceKm: number;
+  estimatedMinutes: number;
+  walkingIntensity: WalkingIntensity;
   score: number;
   description: string;
 };

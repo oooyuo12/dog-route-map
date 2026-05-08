@@ -15,11 +15,28 @@ const CATEGORY_LABEL: Record<string, string> = {
   GROOMING: "미용·목욕샵",
 };
 
+const INTENSITY_COLOR: Record<string, { background: string; color: string }> = {
+  가벼움: {
+    background: "#dcfce7",
+    color: "#166534",
+  },
+  보통: {
+    background: "#fef3c7",
+    color: "#92400e",
+  },
+  "긴 코스": {
+    background: "#fee2e2",
+    color: "#991b1b",
+  },
+};
+
 export default function RouteCard({
   route,
   isSelected,
   onSelect,
 }: RouteCardProps) {
+  const intensityStyle = INTENSITY_COLOR[route.walkingIntensity];
+
   return (
     <button
       type="button"
@@ -46,6 +63,7 @@ export default function RouteCard({
           alignItems: "center",
           gap: "12px",
           marginBottom: "10px",
+          flexWrap: "wrap",
         }}
       >
         <h3
@@ -105,6 +123,30 @@ export default function RouteCard({
           }}
         >
           예상 거리 {route.totalDistanceKm}km
+        </span>
+
+        <span
+          style={{
+            padding: "8px 12px",
+            borderRadius: "10px",
+            background: "#dbeafe",
+            color: "#1e40af",
+            fontWeight: 700,
+          }}
+        >
+          예상 시간 약 {route.estimatedMinutes}분
+        </span>
+
+        <span
+          style={{
+            padding: "8px 12px",
+            borderRadius: "10px",
+            background: intensityStyle.background,
+            color: intensityStyle.color,
+            fontWeight: 700,
+          }}
+        >
+          산책 강도 {route.walkingIntensity}
         </span>
 
         <span

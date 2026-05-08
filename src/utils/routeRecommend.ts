@@ -120,6 +120,26 @@ function selectBestPinByCategory(
     .sort((a, b) => b.score - a.score)[0].pin;
 }
 
+function getEstimatedMinutes(totalDistanceKm: number, pinCount: number): number {
+  const averageDogWalkingSpeedKmh = 3.5;
+  const movingMinutes = (totalDistanceKm / averageDogWalkingSpeedKmh) * 60;
+  const shortStopMinutes = pinCount * 3;
+
+  return Math.max(5, Math.round(movingMinutes + shortStopMinutes));
+}
+
+function getWalkingIntensity(totalDistanceKm: number) {
+  if (totalDistanceKm <= 1) {
+    return "가벼움";
+  }
+
+  if (totalDistanceKm <= 2.5) {
+    return "보통";
+  }
+
+  return "긴 코스";
+}
+
 function buildRoute(
   pins: Pin[],
   purpose: Purpose,
@@ -159,6 +179,15 @@ function buildRoute(
 
   const totalDistanceKm = getRouteDistanceKm(routeLocations);
 
+  const estimatedMinutes = getEstimatedMinutes(
+  totalDistanceKm,
+  selectedPins.length
+);
+
+const walkingIntensity = getWalkingIntensity(totalDistanceKm);
+
+
+
   const averagePinScore =
     selectedPins.length === 0
       ? 0
@@ -183,6 +212,8 @@ function buildRoute(
     purpose,
     pins: selectedPins,
     totalDistanceKm,
+    estimatedMinutes,
+    walkingIntensity,
     score,
     description: `${strategy.descriptionPrefix} ${PURPOSE_DESCRIPTION[purpose]}`,
   };
