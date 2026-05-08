@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CategoryFilter from "./components/CategoryFilter";
+import MapLegend from "./components/MapLegend";
 import MapView from "./components/MapView";
 import PurposeSelector from "./components/PurposeSelector";
 import RouteCard from "./components/RouteCard";
 import { pins } from "./data/pins";
 import type { PinCategory, Purpose } from "./types";
-import { recommendRoute } from "./utils/routeRecommend";
+import { recommendRoutes } from "./utils/routeRecommend";
 
 const ALL_CATEGORIES: PinCategory[] = [
   "CAFE",
@@ -21,13 +22,20 @@ export default function App() {
     useState<PinCategory[]>(ALL_CATEGORIES);
 
   const [selectedPurpose, setSelectedPurpose] = useState<Purpose>("WALK");
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
 
   const visiblePins = useMemo(() => {
     return pins.filter((pin) => selectedCategories.includes(pin.category));
   }, [selectedCategories]);
 
-  const route = useMemo(() => {
-    return recommendRoute(pins, selectedPurpose);
+  const routeOptions = useMemo(() => {
+    return recommendRoutes(pins, selectedPurpose);
+  }, [selectedPurpose]);
+
+  const selectedRoute = routeOptions[selectedRouteIndex] ?? routeOptions[0];
+
+  useEffect(() => {
+    setSelectedRouteIndex(0);
   }, [selectedPurpose]);
 
   const handleToggleCategory = (category: PinCategory) => {
@@ -68,9 +76,23 @@ export default function App() {
         onClearAll={handleClearAll}
       />
 
-      <MapView pins={visiblePins} routePins={route.pins} />
+      <MapLegend />
 
-      <RouteCard route={route} />
+      <MapView pins={visiblePins} routePins={selectedRoute.pins} />
+
+      <section style={{ marginTop: "20px" }}>
+        <h2>추천 루트 3개</h2>
+        <p>카드를 클릭하면 해당 루트가 지도에 표시됩니다.</p>
+
+        {routeOptions.map((route, index) => (
+          <RouteCard
+            key={route.id}
+            route={route}
+            isSelected={selectedRouteIndex === index}
+            onSelect={() => setSelectedRouteIndex(index)}
+          />
+        ))}
+      </section>
     </main>
   );
 }

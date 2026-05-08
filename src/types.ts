@@ -29,6 +29,8 @@ export type Purpose =
   | "STRESS_RELIEF";
 
 export type RouteResult = {
+  id: string;
+  title: string;
   purpose: Purpose;
   pins: Pin[];
   totalDistanceKm: number;

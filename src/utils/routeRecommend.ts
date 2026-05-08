@@ -6,6 +6,19 @@ type Location = {
   lng: number;
 };
 
+type RouteStrategy = "BALANCED" | "SHORT_DISTANCE" | "DOG_FRIENDLY";
+
+type StrategyConfig = {
+  id: RouteStrategy;
+  title: string;
+  descriptionPrefix: string;
+  dogFriendlyWeight: number;
+  routePriorityWeight: number;
+  accessibilityWeight: number;
+  safetyWeight: number;
+  distanceWeight: number;
+};
+
 const DEFAULT_START_LOCATION: Location = {
   lat: 37.5408,
   lng: 127.0693,
@@ -27,7 +40,44 @@ const PURPOSE_DESCRIPTION: Record<Purpose, string> = {
   STRESS_RELIEF: "공원 중심으로 반려견의 스트레스 해소를 우선한 루트입니다.",
 };
 
-function getPinScore(pin: Pin, from: Location): number {
+const STRATEGIES: StrategyConfig[] = [
+  {
+    id: "BALANCED",
+    title: "균형 추천 코스",
+    descriptionPrefix: "거리, 접근성, 반려견 친화도를 균형 있게 고려한 코스입니다.",
+    dogFriendlyWeight: 10,
+    routePriorityWeight: 10,
+    accessibilityWeight: 6,
+    safetyWeight: 6,
+    distanceWeight: 8,
+  },
+  {
+    id: "SHORT_DISTANCE",
+    title: "짧은 거리 코스",
+    descriptionPrefix: "이동 거리를 줄이는 것을 우선한 코스입니다.",
+    dogFriendlyWeight: 6,
+    routePriorityWeight: 6,
+    accessibilityWeight: 8,
+    safetyWeight: 5,
+    distanceWeight: 16,
+  },
+  {
+    id: "DOG_FRIENDLY",
+    title: "반려견 친화 코스",
+    descriptionPrefix: "반려견 친화도와 안전성을 우선한 코스입니다.",
+    dogFriendlyWeight: 16,
+    routePriorityWeight: 8,
+    accessibilityWeight: 5,
+    safetyWeight: 10,
+    distanceWeight: 6,
+  },
+];
+
+function getPinScore(
+  pin: Pin,
+  from: Location,
+  strategy: StrategyConfig
+): number {
   const distanceKm = getDistanceKm(from, {
     lat: pin.lat,
     lng: pin.lng,
@@ -39,11 +89,11 @@ function getPinScore(pin: Pin, from: Location): number {
   const safetyScore = pin.safetyScore ?? 3;
 
   return (
-    dogFriendlyScore * 10 +
-    routePriorityScore * 10 +
-    accessibilityScore * 6 +
-    safetyScore * 6 -
-    distanceKm * 8
+    dogFriendlyScore * strategy.dogFriendlyWeight +
+    routePriorityScore * strategy.routePriorityWeight +
+    accessibilityScore * strategy.accessibilityWeight +
+    safetyScore * strategy.safetyWeight -
+    distanceKm * strategy.distanceWeight
   );
 }
 
@@ -51,7 +101,8 @@ function selectBestPinByCategory(
   pins: Pin[],
   category: PinCategory,
   from: Location,
-  selectedPinIds: string[]
+  selectedPinIds: string[],
+  strategy: StrategyConfig
 ): Pin | undefined {
   const candidates = pins.filter(
     (pin) => pin.category === category && !selectedPinIds.includes(pin.id)
@@ -64,15 +115,16 @@ function selectBestPinByCategory(
   return candidates
     .map((pin) => ({
       pin,
-      score: getPinScore(pin, from),
+      score: getPinScore(pin, from, strategy),
     }))
     .sort((a, b) => b.score - a.score)[0].pin;
 }
 
-export function recommendRoute(
+function buildRoute(
   pins: Pin[],
   purpose: Purpose,
-  startLocation: Location = DEFAULT_START_LOCATION
+  strategy: StrategyConfig,
+  startLocation: Location
 ): RouteResult {
   const requiredCategories = PURPOSE_ROUTE_MAP[purpose];
 
@@ -84,7 +136,8 @@ export function recommendRoute(
       pins,
       category,
       currentLocation,
-      selectedPins.map((pin) => pin.id)
+      selectedPins.map((pin) => pin.id),
+      strategy
     );
 
     if (selectedPin) {
@@ -96,10 +149,13 @@ export function recommendRoute(
     }
   }
 
-  const routeLocations = selectedPins.map((pin) => ({
-    lat: pin.lat,
-    lng: pin.lng,
-  }));
+  const routeLocations = [
+    startLocation,
+    ...selectedPins.map((pin) => ({
+      lat: pin.lat,
+      lng: pin.lng,
+    })),
+  ];
 
   const totalDistanceKm = getRouteDistanceKm(routeLocations);
 
@@ -109,23 +165,35 @@ export function recommendRoute(
       : selectedPins.reduce((sum, pin) => {
           return (
             sum +
-            (pin.dogFriendlyScore ?? 3) * 10 +
-            (pin.routePriorityScore ?? 3) * 10 +
-            (pin.accessibilityScore ?? 3) * 6 +
-            (pin.safetyScore ?? 3) * 6
+            (pin.dogFriendlyScore ?? 3) * strategy.dogFriendlyWeight +
+            (pin.routePriorityScore ?? 3) * strategy.routePriorityWeight +
+            (pin.accessibilityScore ?? 3) * strategy.accessibilityWeight +
+            (pin.safetyScore ?? 3) * strategy.safetyWeight
           );
         }, 0) / selectedPins.length;
 
   const score = Math.max(
     0,
-    Math.round(averagePinScore - totalDistanceKm * 5)
+    Math.round(averagePinScore - totalDistanceKm * strategy.distanceWeight)
   );
 
   return {
+    id: strategy.id,
+    title: strategy.title,
     purpose,
     pins: selectedPins,
     totalDistanceKm,
     score,
-    description: PURPOSE_DESCRIPTION[purpose],
+    description: `${strategy.descriptionPrefix} ${PURPOSE_DESCRIPTION[purpose]}`,
   };
+}
+
+export function recommendRoutes(
+  pins: Pin[],
+  purpose: Purpose,
+  startLocation: Location = DEFAULT_START_LOCATION
+): RouteResult[] {
+  return STRATEGIES.map((strategy) =>
+    buildRoute(pins, purpose, strategy, startLocation)
+  );
 }
