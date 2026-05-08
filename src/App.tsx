@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import CategoryFilter from "./components/CategoryFilter";
+import CurrentLocationControl from "./components/CurrentLocationControl";
 import DogConditionFilter from "./components/DogConditionFilter";
 import MapLegend from "./components/MapLegend";
 import MapView from "./components/MapView";
@@ -10,11 +11,19 @@ import { pins } from "./data/pins";
 import type {
   DogConditionFilters,
   DogSize,
+  Location,
   Pin,
   PinCategory,
   Purpose,
 } from "./types";
 import { recommendRoutes } from "./utils/routeRecommend";
+
+type LocationStatus = "idle" | "loading" | "success" | "error";
+
+const DEFAULT_LOCATION: Location = {
+  lat: 37.5408,
+  lng: 127.0693,
+};
 
 const ALL_CATEGORIES: PinCategory[] = [
   "CAFE",
@@ -99,14 +108,17 @@ export default function App() {
   const [dogFilters, setDogFilters] =
     useState<DogConditionFilters>(INITIAL_DOG_FILTERS);
 
-  // 추천 루트 계산에 사용할 장소
-  // 검색어와 카테고리 필터는 화면 표시용에 가깝고,
-  // 반려견 조건 필터는 실제 추천 조건으로 반영한다.
+  const [userLocation, setUserLocation] = useState<Location | null>(null);
+  const [mapCenter, setMapCenter] = useState<Location>(DEFAULT_LOCATION);
+  const [locationStatus, setLocationStatus] =
+    useState<LocationStatus>("idle");
+
+  const routeStartLocation = userLocation ?? DEFAULT_LOCATION;
+
   const routeCandidatePins = useMemo(() => {
     return pins.filter((pin) => matchesDogFilters(pin, dogFilters));
   }, [dogFilters]);
 
-  // 지도에 실제로 표시할 장소
   const visiblePins = useMemo(() => {
     return routeCandidatePins.filter((pin) => {
       const isCategorySelected = selectedCategories.includes(pin.category);
@@ -120,8 +132,8 @@ export default function App() {
   }, [routeCandidatePins, selectedCategories, searchQuery]);
 
   const routeOptions = useMemo(() => {
-    return recommendRoutes(routeCandidatePins, selectedPurpose);
-  }, [routeCandidatePins, selectedPurpose]);
+    return recommendRoutes(routeCandidatePins, selectedPurpose, routeStartLocation);
+  }, [routeCandidatePins, selectedPurpose, routeStartLocation]);
 
   const selectedRoute = routeOptions[selectedRouteIndex] ?? routeOptions[0];
 
@@ -129,7 +141,37 @@ export default function App() {
 
   useEffect(() => {
     setSelectedRouteIndex(0);
-  }, [selectedPurpose, dogFilters]);
+  }, [selectedPurpose, dogFilters, userLocation]);
+
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("error");
+      return;
+    }
+
+    setLocationStatus("loading");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const nextLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        setUserLocation(nextLocation);
+        setMapCenter(nextLocation);
+        setLocationStatus("success");
+      },
+      () => {
+        setLocationStatus("error");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+  };
 
   const handleToggleCategory = (category: PinCategory) => {
     setSelectedCategories((prev) => {
@@ -201,6 +243,11 @@ export default function App() {
         루트를 표시합니다.
       </p>
 
+      <CurrentLocationControl
+        status={locationStatus}
+        onUseCurrentLocation={handleUseCurrentLocation}
+      />
+
       <PurposeSelector
         selectedPurpose={selectedPurpose}
         onChange={setSelectedPurpose}
@@ -259,7 +306,13 @@ export default function App() {
         </span>
       </div>
 
-      <MapView pins={visiblePins} routePins={selectedRoute.pins} />
+      <MapView
+        pins={visiblePins}
+        routePins={selectedRoute.pins}
+        center={mapCenter}
+        userLocation={userLocation}
+        routeStartLocation={routeStartLocation}
+      />
 
       {visiblePins.length === 0 && (
         <section
