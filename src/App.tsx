@@ -6,6 +6,7 @@ import MapLegend from "./components/MapLegend";
 import MapView from "./components/MapView";
 import PurposeSelector from "./components/PurposeSelector";
 import RouteCard from "./components/RouteCard";
+import RouteDirectionsPanel from "./components/RouteDirectionsPanel";
 import SearchBox from "./components/SearchBox";
 import { pins } from "./data/pins";
 import type {
@@ -17,7 +18,10 @@ import type {
   Purpose,
 } from "./types";
 import { recommendRoutes } from "./utils/routeRecommend";
-import { fetchWalkingRoutePath, type MapPath } from "./utils/walkingRoute";
+import {
+  fetchWalkingRoute,
+  type WalkingRouteResult,
+} from "./utils/walkingRoute";
 
 type LocationStatus = "idle" | "loading" | "success" | "error";
 type WalkingRouteStatus = "idle" | "loading" | "success" | "error";
@@ -163,9 +167,9 @@ export default function App() {
   const [locationStatus, setLocationStatus] =
     useState<LocationStatus>("idle");
 
-  const [walkingRoutePath, setWalkingRoutePath] = useState<MapPath | null>(
-    null
-  );
+  const [walkingRouteResult, setWalkingRouteResult] =
+    useState<WalkingRouteResult | null>(null);
+
   const [walkingRouteStatus, setWalkingRouteStatus] =
     useState<WalkingRouteStatus>("idle");
 
@@ -196,6 +200,9 @@ export default function App() {
   }, [routeCandidatePins, selectedPurpose, routeStartLocation]);
 
   const selectedRoute = routeOptions[selectedRouteIndex] ?? routeOptions[0];
+
+  const walkingRoutePath = walkingRouteResult?.path ?? null;
+  const walkingRouteSegments = walkingRouteResult?.segments ?? [];
 
   const isRouteIncomplete = selectedRoute.pins.length === 0;
 
@@ -242,7 +249,7 @@ export default function App() {
 
     async function loadWalkingRoute() {
       if (!selectedRoute || selectedRoute.pins.length === 0) {
-        setWalkingRoutePath(null);
+        setWalkingRouteResult(null);
         setWalkingRouteStatus("idle");
         return;
       }
@@ -250,20 +257,20 @@ export default function App() {
       try {
         setWalkingRouteStatus("loading");
 
-        const path = await fetchWalkingRoutePath(
+        const result = await fetchWalkingRoute(
           routeStartLocation,
           selectedRoute.pins
         );
 
         if (!isCancelled) {
-          setWalkingRoutePath(path);
+          setWalkingRouteResult(result);
           setWalkingRouteStatus("success");
         }
       } catch (error) {
         console.error(error);
 
         if (!isCancelled) {
-          setWalkingRoutePath(null);
+          setWalkingRouteResult(null);
           setWalkingRouteStatus("error");
         }
       }
@@ -433,6 +440,12 @@ export default function App() {
         userLocation={userLocation}
         routeStartLocation={routeStartLocation}
         walkingRoutePath={walkingRoutePath}
+        walkingRouteSegments={walkingRouteSegments}
+      />
+
+      <RouteDirectionsPanel
+        status={walkingRouteStatus}
+        route={walkingRouteResult}
       />
 
       {visiblePins.length === 0 && (

@@ -8,10 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "convert:pins":"node scripts/convertPinsCsv.cjs"
+    "convert:pins": "node scripts/convertPinsCsv.cjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
+    "leaflet-polylineoffset": "^1.1.1",
     "papaparse": "^5.5.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
