@@ -1,23 +1,13 @@
-id,name,category,lat,lng,address,description,dogFriendlyScore,routePriorityScore,accessibilityScore,safetyScore,dogSizeAllowed,indoorAllowed,parkingAvailable,reservationRequired,leashRequired,source,lastChecked,notes
-cafe-001,티코스커피,CAFE,37.4539,127.1273,경기 성남시 수정구 복정로 10,가천대 후문 근처 애견 동반 가능 카페 후보,4,4,5,4,SMALL|MEDIUM,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,운영조건 재확인 필요
-cafe-002,ban dog cafe,CAFE,37.4566,127.1284,경기 성남시 수정구 복정로 63-1 4층,복정동 애견동반 카페 후보,5,5,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,FALSE,TRUE,1차조사,2026-05-08,운영시간 재확인 필요
-cafe-003,이즈 케이크,CAFE,37.4692,127.1396,경기 성남시 수정구 위례순환로4길 20 지하1층,위례 창곡천 근처 애견동반 카페 후보,4,3,3,4,SMALL|MEDIUM,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,좌표 재확인 필요
-cafe-004,애비로드커피바,CAFE,37.4751,127.1401,경기 성남시 수정구 위례서일로1길 22 1층 103호,위례 애견동반 가능 카페 후보,4,3,3,4,SMALL|MEDIUM,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,야간 운영 여부 확인 필요
-cafe-005,위례빵집,CAFE,37.4680,127.1534,경기 성남시 수정구 위례순환로 130 아트리버상가 2단지 1층,대형견 가능 정보가 있는 위례 베이커리 카페 후보,5,4,3,4,SMALL|MEDIUM|LARGE,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,동반 조건 재확인 필요
-park-001,복정공원,PARK,37.4677109,127.1278633,경기 성남시 수정구 복정동 635,벤치와 어린이놀이터가 있는 어린이공원,3,4,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,반려견 출입 조건 확인 필요
-park-002,복우물공원,PARK,37.45551308,127.1280969,경기 성남시 수정구 복정동 697,복정동 어린이공원 및 산책 후보지,4,5,5,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,배변시설 위치 현장 확인 필요
-park-003,기왓골어린이공원,PARK,37.463782222748,127.127676501319,경기 성남시 수정구 복정로118번길 7,복정동 내 소규모 어린이공원 후보,3,3,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,혼잡도 확인 필요
-park-004,희망대공원,PARK,37.44930274,127.1501855,경기 성남시 수정구 희망로509번길 20,넓은 근린공원 및 산책 후보지,5,5,3,5,SMALL|MEDIUM|LARGE,FALSE,TRUE,FALSE,TRUE,1차조사,2026-05-08,가천대에서 거리가 있음
-park-005,탄천민물고기습지생태원,PARK,37.4497454774,127.1270219218,경기 성남시 수정구 태평동,탄천변 산책과 생태 관찰이 가능한 산책 후보지,4,5,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,1차조사,2026-05-08,산책로 접근성 확인 필요
-hospital-001,이플동물병원,HOSPITAL,37.4564,127.1286,경기 성남시 수정구 복정로 35,복정동 동물병원 후보,3,5,5,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,진료시간 재확인 필요
-hospital-002,태평역 동물병원,HOSPITAL,37.4408,127.1269,경기 성남시 수정구 성남대로 1222 예농빌딩 1층,수진동 태평역 인근 동물병원 후보,3,4,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,가천대에서 거리가 있음
-hospital-003,건국동물병원,HOSPITAL,37.4439,127.1308,경기 성남시 수정구 수정로 131,태평동 동물병원 후보,3,4,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,좌표 재확인 필요
-hospital-004,중앙동물병원,HOSPITAL,37.4444,127.1313,경기 성남시 수정구 수정로 139,태평동 동물병원 후보,4,4,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,미용 및 호텔 가능 여부 확인 필요
-hospital-005,성남 시립동물병원,HOSPITAL,37.4448,127.1287,경기 성남시 수정구 탄리로 59 수정커뮤니티센터 지하1층,수진동 수정커뮤니티센터 인근 동물병원 후보,3,4,4,4,SMALL|MEDIUM|LARGE,TRUE,TRUE,TRUE,TRUE,1차조사,2026-05-08,예약 필요 여부 확인 필요
-store-001,퍼피파라다이스,PET_STORE,37.4581,127.1277,경기 성남시 수정구 성남대로1380번길 11-2,복정동 반려동물용품 업체 후보,3,3,4,3,SMALL|MEDIUM,TRUE,FALSE,FALSE,TRUE,1차조사,2026-05-08,운영 형태 확인 필요
-store-002,비앤샵,PET_STORE,37.4560,127.1282,경기 성남시 수정구 복정동 698 1층,반려동물용품 카테고리 운영 정보가 있는 업체 후보,3,3,4,3,SMALL|MEDIUM,TRUE,FALSE,FALSE,TRUE,1차조사,2026-05-08,동반 입장 여부 확인 필요
-store-003,독샤워,PET_STORE,37.4683,127.1391,경기 성남시 수정구 위례서로 18 2층,위례 인근 반려동물용품 및 케어 관련 후보,4,3,3,4,SMALL|MEDIUM|LARGE,TRUE,TRUE,FALSE,TRUE,1차조사,2026-05-08,세부 서비스 확인 필요
-grooming-001,강아지이발소 견,GROOMING,37.4561,127.1285,경기 성남시 수정구 복정동 695-10,복정동 애견미용 후보,4,5,4,4,SMALL|MEDIUM|LARGE,TRUE,FALSE,TRUE,TRUE,1차조사,2026-05-08,예약 방식 확인 필요
-grooming-002,장독 펫살롱,GROOMING,37.4755,127.1426,경기 성남시 수정구 위례광장로104 2층 2236호,위례 애견미용샵 후보,4,4,3,4,SMALL|MEDIUM,TRUE,TRUE,TRUE,TRUE,1차조사,2026-05-08,가천대에서 거리가 있음
-toilet-001,복우물공원 배변시설 후보,TOILET,37.4550,127.1287,경기 성남시 수정구 복정동 697 인근,배변봉투함 및 쓰레기통 현장 확인 필요,3,4,5,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,현장확인필요,2026-05-08,정확한 시설 위치 확인 필요
-toilet-002,탄천 산책로 배변시설 후보,TOILET,37.4497,127.1270,탄천민물고기습지생태원 인근,탄천 산책로 인근 배변 처리 후보,3,5,4,4,SMALL|MEDIUM|LARGE,FALSE,FALSE,FALSE,TRUE,현장확인필요,2026-05-08,정확한 배변봉투함 위치 확인 필요
+id	name	category	lat	lng	address	description	dogFriendlyScore	routePriorityScore	accessibilityScore	safetyScore	dogSizeAllowed	indoorAllowed	parkingAvailable	reservationRequired	leashRequired	source	lastChecked	notes
+park-dukyi-001	일산서구 반려동물공원	PARK	37.6882	126.7652	고양시 일산서구 경의로 766	대형견·소형견 모두 추천. 배변처리 편의 좋음. 야간 이용 가능. 활동량 많은 반려견 추천.	5	5	4	4	SMALL|MEDIUM|LARGE	FALSE	TRUE	FALSE	TRUE	고양원픽|좌표보정	2026-05-10	좌표 입력 필요. 실제 야간 조명 밝기, 피크 시간 혼잡도는 현장 확인 필요. 주소 기준 온라인 보정 좌표. 최종 현장/지도 확인 권장.
+toilet-dukyi-001	일산서구 반려동물공원 내 배변처리 지점	TOILET	37.68835	126.76535	고양시 일산서구 경의로 766	배변봉투 있음 / 쓰레기통 있음 / 산책 시작 전·귀가 전 추천.	4	5	4	4	SMALL|MEDIUM|LARGE	FALSE	TRUE	FALSE	TRUE	고양원픽|좌표보정	2026-05-10	좌표 입력 필요. 배변봉투 재고 상태, 악취·위생 상태는 실시간 확인 필요. 공원 내 배변처리 후보 지점. 공원 좌표 기준 소폭 보정. 정확 위치 현장 확인 필요.
+toilet-dukyi-002	탄현공원 배변봉투 수거함	TOILET	37.6974	126.7667	탄현공원	배변봉투 수거함 후보. 탄현 생활권 산책 중간 경유지로 적합.	3	3	3	3	SMALL|MEDIUM|LARGE	FALSE		FALSE	TRUE	국민일보|좌표보정	2026-05-10	좌표 입력 필요. 정확한 위치, 현재 유지 여부, 야간 조명, 위생 상태 확인 필요. 탄현공원 중심부 기준 보정 좌표. 배변봉투 수거함의 실제 위치 현장 확인 필요.
+cafe-dukyi-001	카페더공생	CAFE	37.69251493	126.7574248	경기 고양시 일산서구 탄중로 111	소형견 중심 애견카페. 실내·실외 이용 가능. 산책 후 휴식/보호자 식사 추천.	4	5	4	4	SMALL|MEDIUM	TRUE	TRUE	FALSE	TRUE	트립인포|다이닝코드|좌표보정	2026-05-10	좌표 입력 필요. 운영시간 자료 상충. 물그릇 제공, 혼잡도 미확인. 탄중로 111 주소 좌표 적용. 운영시간/혼잡도 확인 필요.
+cafe-dukyi-002	테일더블루	CAFE	37.69905311	126.7535758		소형견 루프탑 애견카페. 실내+야외 공간. 반려견 식사 가능.	5	5	4	4	SMALL	TRUE	TRUE		TRUE	반려생활|알바몬|좌표보정	2026-05-10	주소/좌표 입력 필요. 최신 운영시간, 입장료, 물그릇, 예약 필요 여부 확인 필요. 하이파크2로 40 금문프라자 주소 좌표 적용. 운영조건 확인 필요.
+store-dukyi-001	폴리파크 덕이점	PET_STORE	37.69345	126.76015		24시간 산책용품 보충 장소. 사료·간식·위생용품 구매 후보. 야간 산책 전 경유 추천.	4	5	5	4	SMALL|MEDIUM|LARGE	TRUE	TRUE	FALSE	TRUE	멍클럽|폴리파크|좌표보정	2026-05-10	주소/좌표 입력 필요. 실제 무인 시간, 특정 재고, 대형견 용품 보유량 확인 필요. 경의로 847-5 주소 기준 보정 좌표. 정확 좌표 최종 확인 권장.
+store-dukyi-002	펫존 덕이점	PET_STORE	37.6951	126.76183	경기 고양시 일산서구 경의로 873	반려견 동반 입장 가능 용품점. 산책 전 준비/물품 보충 추천.	4	4	4	4	SMALL|MEDIUM|LARGE	TRUE	TRUE	FALSE	TRUE	펫온|멍클럽|좌표보정	2026-05-10	좌표 입력 필요. 운영시간 충돌. 앱에는 운영시간 확인 필요 표시 권장. 경의로 873 주소 기준 보정 좌표. 운영시간 충돌 확인 필요.
+store-dukyi-003	펫투데이	PET_STORE	37.6968	126.7472	경기 고양시 일산서구 덕이동 533-1	사료·간식·배변패드 구매 후보. 용품점 보조 핀으로 적합.	3	3	3	3				FALSE	TRUE	생활정보114|좌표보정	2026-05-10	좌표 입력 필요. 반려견 동반 입장 가능 여부, 운영시간, 주차 여부 확인 필요. 덕이동 533-1/덕이로 134 주소 기준 보정 좌표. 동반 입장 여부 확인 필요.
+hospital-dukyi-001	돌봄동물병원	HOSPITAL	37.69915055	126.7539582	경기 고양시 일산서구 하이파크2로 42	덕이동 하이파크시티권 근처 병원. 정기검진/산책 중 이상 발생 시 후보.	3	5	4	4	SMALL|MEDIUM|LARGE	TRUE		TRUE	TRUE	비마이펫|좌표보정	2026-05-10	좌표 입력 필요. 운영시간, 예약 필요 여부, 야간·응급진료 여부 확인 필요. 하이파크2로 42 주소 좌표 적용. 운영시간/예약/응급진료 확인 필요.
+hospital-dukyi-002	조이동물병원	HOSPITAL	37.69251493	126.7574248	경기 고양시 일산서구 탄중로 111 양우로데오메인타운	덕이동 로데오거리권 병원. 카페더공생·펫존 근처 안전망 후보.	3	5	4	4	SMALL|MEDIUM|LARGE	TRUE		TRUE	TRUE	펫포털|업체창고|좌표보정	2026-05-10	좌표 입력 필요. 야간·응급진료 여부, 예약 여부, 주차, 주요 진료과목 확인 필요. 탄중로 111 양우로데오메인타운 주소 좌표 적용. 진료정보 확인 필요.
+park-dukyi-002	덕이근린1	PARK	37.701779	126.7544876	경기 고양시 일산서구 덕이동 산145-1	덕이동 내부 짧은 산책 후보. 보호자 운동 병행 가능.	3	3	4	3	SMALL|MEDIUM|LARGE	FALSE		FALSE	TRUE	전국도시공원 지도|우리천사	2026-05-10	반려견 산책 안내, 목줄 표지판, 쓰레기통, 조명, 배변봉투함 온라인 확인 부족.
+park-dukyi-003	덕이근린2	PARK	37.69601631	126.7494325	경기 고양시 일산서구 덕이동 산131-7	짧은 동네 산책 보조 후보. 조용한 루트 구성용.	3	3	3	3	SMALL|MEDIUM|LARGE	FALSE		FALSE	TRUE	클럽리치투어	2026-05-10	반려견 산책 가능 안내, 조명, 벤치, 쓰레기통, 배변처리 편의 온라인 확인 부족.

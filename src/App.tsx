@@ -17,8 +17,10 @@ import type {
   Purpose,
 } from "./types";
 import { recommendRoutes } from "./utils/routeRecommend";
+import { fetchWalkingRoutePath, type MapPath } from "./utils/walkingRoute";
 
 type LocationStatus = "idle" | "loading" | "success" | "error";
+type WalkingRouteStatus = "idle" | "loading" | "success" | "error";
 
 const DEFAULT_LOCATION: Location = {
   lat: 37.4509,
@@ -98,6 +100,54 @@ function matchesSearchQuery(pin: Pin, searchQuery: string): boolean {
   return searchableText.includes(normalizedQuery);
 }
 
+function getWalkingRouteStatusText(status: WalkingRouteStatus) {
+  if (status === "loading") {
+    return "보행 경로를 계산하는 중입니다...";
+  }
+
+  if (status === "success") {
+    return "보행 가능한 도로·산책로 기준으로 경로를 표시하고 있습니다.";
+  }
+
+  if (status === "error") {
+    return "보행 경로 계산에 실패해 임시 직선 경로로 표시합니다.";
+  }
+
+  return "추천 루트를 선택하면 경로가 표시됩니다.";
+}
+
+function getWalkingRouteStatusStyle(status: WalkingRouteStatus) {
+  if (status === "success") {
+    return {
+      background: "#ecfdf5",
+      color: "#166534",
+      border: "1px solid #bbf7d0",
+    };
+  }
+
+  if (status === "error") {
+    return {
+      background: "#fef2f2",
+      color: "#991b1b",
+      border: "1px solid #fecaca",
+    };
+  }
+
+  if (status === "loading") {
+    return {
+      background: "#eff6ff",
+      color: "#1e40af",
+      border: "1px solid #bfdbfe",
+    };
+  }
+
+  return {
+    background: "#f8fafc",
+    color: "#334155",
+    border: "1px solid #e2e8f0",
+  };
+}
+
 export default function App() {
   const [selectedCategories, setSelectedCategories] =
     useState<PinCategory[]>(ALL_CATEGORIES);
@@ -112,6 +162,12 @@ export default function App() {
   const [mapCenter, setMapCenter] = useState<Location>(DEFAULT_LOCATION);
   const [locationStatus, setLocationStatus] =
     useState<LocationStatus>("idle");
+
+  const [walkingRoutePath, setWalkingRoutePath] = useState<MapPath | null>(
+    null
+  );
+  const [walkingRouteStatus, setWalkingRouteStatus] =
+    useState<WalkingRouteStatus>("idle");
 
   const routeStartLocation = userLocation ?? DEFAULT_LOCATION;
 
@@ -132,7 +188,11 @@ export default function App() {
   }, [routeCandidatePins, selectedCategories, searchQuery]);
 
   const routeOptions = useMemo(() => {
-    return recommendRoutes(routeCandidatePins, selectedPurpose, routeStartLocation);
+    return recommendRoutes(
+      routeCandidatePins,
+      selectedPurpose,
+      routeStartLocation
+    );
   }, [routeCandidatePins, selectedPurpose, routeStartLocation]);
 
   const selectedRoute = routeOptions[selectedRouteIndex] ?? routeOptions[0];
@@ -144,38 +204,77 @@ export default function App() {
   }, [selectedPurpose, dogFilters, userLocation]);
 
   const handleUseCurrentLocation = useCallback(() => {
-  if (!navigator.geolocation) {
-    setLocationStatus("error");
-    return;
-  }
-
-  setLocationStatus("loading");
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const nextLocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
-
-      setUserLocation(nextLocation);
-      setMapCenter(nextLocation);
-      setLocationStatus("success");
-    },
-    () => {
+    if (!navigator.geolocation) {
       setLocationStatus("error");
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 60000,
+      return;
     }
-  );
-}, []);
 
-useEffect(() => {
-  handleUseCurrentLocation();
-}, [handleUseCurrentLocation]);
+    setLocationStatus("loading");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const nextLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        setUserLocation(nextLocation);
+        setMapCenter(nextLocation);
+        setLocationStatus("success");
+      },
+      () => {
+        setLocationStatus("error");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    handleUseCurrentLocation();
+  }, [handleUseCurrentLocation]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadWalkingRoute() {
+      if (!selectedRoute || selectedRoute.pins.length === 0) {
+        setWalkingRoutePath(null);
+        setWalkingRouteStatus("idle");
+        return;
+      }
+
+      try {
+        setWalkingRouteStatus("loading");
+
+        const path = await fetchWalkingRoutePath(
+          routeStartLocation,
+          selectedRoute.pins
+        );
+
+        if (!isCancelled) {
+          setWalkingRoutePath(path);
+          setWalkingRouteStatus("success");
+        }
+      } catch (error) {
+        console.error(error);
+
+        if (!isCancelled) {
+          setWalkingRoutePath(null);
+          setWalkingRouteStatus("error");
+        }
+      }
+    }
+
+    loadWalkingRoute();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedRoute, routeStartLocation]);
 
   const handleToggleCategory = (category: PinCategory) => {
     setSelectedCategories((prev) => {
@@ -237,6 +336,9 @@ useEffect(() => {
   const handleClearDogFilters = () => {
     setDogFilters(INITIAL_DOG_FILTERS);
   };
+
+  const walkingRouteStatusStyle =
+    getWalkingRouteStatusStyle(walkingRouteStatus);
 
   return (
     <main style={{ padding: "24px", maxWidth: "1000px", margin: "0 auto" }}>
@@ -310,12 +412,27 @@ useEffect(() => {
         </span>
       </div>
 
+      <section
+        style={{
+          margin: "12px 0",
+          padding: "12px",
+          borderRadius: "12px",
+          background: walkingRouteStatusStyle.background,
+          color: walkingRouteStatusStyle.color,
+          border: walkingRouteStatusStyle.border,
+          fontWeight: 700,
+        }}
+      >
+        {getWalkingRouteStatusText(walkingRouteStatus)}
+      </section>
+
       <MapView
         pins={visiblePins}
         routePins={selectedRoute.pins}
         center={mapCenter}
         userLocation={userLocation}
         routeStartLocation={routeStartLocation}
+        walkingRoutePath={walkingRoutePath}
       />
 
       {visiblePins.length === 0 && (

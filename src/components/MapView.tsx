@@ -21,6 +21,7 @@ type MapViewProps = {
   center: Location;
   userLocation: Location | null;
   routeStartLocation: Location;
+  walkingRoutePath: [number, number][] | null;
 };
 
 const CATEGORY_INFO: Record<
@@ -157,11 +158,17 @@ export default function MapView({
   center,
   userLocation,
   routeStartLocation,
+  walkingRoutePath,
 }: MapViewProps) {
-  const routePath: [number, number][] = [
+  const straightRoutePath: [number, number][] = [
     [routeStartLocation.lat, routeStartLocation.lng],
     ...routePins.map((pin) => [pin.lat, pin.lng] as [number, number]),
   ];
+
+  const routePath: [number, number][] =
+    walkingRoutePath && walkingRoutePath.length >= 2
+      ? walkingRoutePath
+      : straightRoutePath;
 
   return (
     <MapContainer
@@ -230,8 +237,8 @@ export default function MapView({
           positions={routePath}
           pathOptions={{
             weight: 5,
-            opacity: 0.85,
-            color: "#2563eb",
+            opacity: 0.9,
+            color: walkingRoutePath ? "#16a34a" : "#2563eb",
           }}
         />
       )}
