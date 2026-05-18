@@ -8,6 +8,9 @@ import PurposeSelector from "./components/PurposeSelector";
 import RouteCard from "./components/RouteCard";
 import RouteDirectionsPanel from "./components/RouteDirectionsPanel";
 import SearchBox from "./components/SearchBox";
+import StartPointSelector, {
+  type StartPointMode,
+} from "./components/StartPointSelector";
 import { pins } from "./data/pins";
 import type {
   DogConditionFilters,
@@ -164,8 +167,16 @@ export default function App() {
 
   const [userLocation, setUserLocation] = useState<Location | null>(null);
   const [mapCenter, setMapCenter] = useState<Location>(DEFAULT_LOCATION);
+  const [mapViewCenter, setMapViewCenter] =
+    useState<Location>(DEFAULT_LOCATION);
   const [locationStatus, setLocationStatus] =
     useState<LocationStatus>("idle");
+
+  const [startPointMode, setStartPointMode] =
+    useState<StartPointMode>("CURRENT");
+  const [selectedStartPinId, setSelectedStartPinId] = useState("");
+  const [customStartLocation, setCustomStartLocation] =
+    useState<Location | null>(null);
 
   const [walkingRouteResult, setWalkingRouteResult] =
     useState<WalkingRouteResult | null>(null);
@@ -173,11 +184,46 @@ export default function App() {
   const [walkingRouteStatus, setWalkingRouteStatus] =
     useState<WalkingRouteStatus>("idle");
 
-  const routeStartLocation = userLocation ?? DEFAULT_LOCATION;
+  const selectedStartPin = useMemo(() => {
+    return pins.find((pin) => pin.id === selectedStartPinId) ?? null;
+  }, [selectedStartPinId]);
+
+  const routeStartLocation = useMemo<Location>(() => {
+    if (startPointMode === "CUSTOM" && customStartLocation) {
+      return customStartLocation;
+    }
+
+    if (startPointMode === "PIN" && selectedStartPin) {
+      return {
+        lat: selectedStartPin.lat,
+        lng: selectedStartPin.lng,
+      };
+    }
+
+    if (startPointMode === "CURRENT" && userLocation) {
+      return userLocation;
+    }
+
+    return DEFAULT_LOCATION;
+  }, [startPointMode, customStartLocation, selectedStartPin, userLocation]);
+
+  const startPins = useMemo(() => {
+    return [...pins].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+  }, []);
 
   const routeCandidatePins = useMemo(() => {
-    return pins.filter((pin) => matchesDogFilters(pin, dogFilters));
-  }, [dogFilters]);
+    return pins.filter((pin) => {
+      if (!matchesDogFilters(pin, dogFilters)) {
+        return false;
+      }
+
+      if (startPointMode === "PIN" && pin.id === selectedStartPinId) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [dogFilters, startPointMode, selectedStartPinId]);
 
   const visiblePins = useMemo(() => {
     return routeCandidatePins.filter((pin) => {
@@ -206,9 +252,20 @@ export default function App() {
 
   const isRouteIncomplete = selectedRoute.pins.length === 0;
 
+  const handleMapCenterChange = useCallback((nextCenter: Location) => {
+    setMapViewCenter(nextCenter);
+  }, []);
+
   useEffect(() => {
     setSelectedRouteIndex(0);
-  }, [selectedPurpose, dogFilters, userLocation]);
+  }, [
+    selectedPurpose,
+    dogFilters,
+    userLocation,
+    startPointMode,
+    selectedStartPinId,
+    customStartLocation,
+  ]);
 
   const handleUseCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -227,6 +284,7 @@ export default function App() {
 
         setUserLocation(nextLocation);
         setMapCenter(nextLocation);
+        setMapViewCenter(nextLocation);
         setLocationStatus("success");
       },
       () => {
@@ -282,6 +340,101 @@ export default function App() {
       isCancelled = true;
     };
   }, [selectedRoute, routeStartLocation]);
+
+  const handleChangeStartPointMode = (mode: StartPointMode) => {
+    setStartPointMode(mode);
+
+    if (mode === "CURRENT") {
+      if (userLocation) {
+        setMapCenter(userLocation);
+        setMapViewCenter(userLocation);
+      } else {
+        handleUseCurrentLocation();
+      }
+    }
+
+    if (mode === "DEFAULT") {
+      setMapCenter(DEFAULT_LOCATION);
+      setMapViewCenter(DEFAULT_LOCATION);
+    }
+
+    if (mode === "PIN" && selectedStartPin) {
+      const nextLocation = {
+        lat: selectedStartPin.lat,
+        lng: selectedStartPin.lng,
+      };
+
+      setMapCenter(nextLocation);
+      setMapViewCenter(nextLocation);
+    }
+  };
+
+  const handleChangeStartPin = (pinId: string) => {
+    setSelectedStartPinId(pinId);
+
+    const nextPin = pins.find((pin) => pin.id === pinId);
+
+    if (nextPin) {
+      const nextLocation = {
+        lat: nextPin.lat,
+        lng: nextPin.lng,
+      };
+
+      setStartPointMode("PIN");
+      setMapCenter(nextLocation);
+      setMapViewCenter(nextLocation);
+    }
+  };
+
+  const handleSetStartToMapCenter = () => {
+    setCustomStartLocation(mapViewCenter);
+    setStartPointMode("CUSTOM");
+    setSelectedStartPinId("");
+    setMapCenter(mapViewCenter);
+  };
+
+  const handleSetStartToCurrentLocation = () => {
+    if (userLocation) {
+      setCustomStartLocation(userLocation);
+      setStartPointMode("CUSTOM");
+      setSelectedStartPinId("");
+      setMapCenter(userLocation);
+      setMapViewCenter(userLocation);
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      setLocationStatus("error");
+      return;
+    }
+
+    setLocationStatus("loading");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const nextLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        setUserLocation(nextLocation);
+        setCustomStartLocation(nextLocation);
+        setStartPointMode("CUSTOM");
+        setSelectedStartPinId("");
+        setMapCenter(nextLocation);
+        setMapViewCenter(nextLocation);
+        setLocationStatus("success");
+      },
+      () => {
+        setLocationStatus("error");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+  };
 
   const handleToggleCategory = (category: PinCategory) => {
     setSelectedCategories((prev) => {
@@ -359,6 +512,17 @@ export default function App() {
       <CurrentLocationControl
         status={locationStatus}
         onUseCurrentLocation={handleUseCurrentLocation}
+      />
+
+      <StartPointSelector
+        mode={startPointMode}
+        pins={startPins}
+        selectedPinId={selectedStartPinId}
+        customStartLocation={customStartLocation}
+        onChangeMode={handleChangeStartPointMode}
+        onChangePin={handleChangeStartPin}
+        onSetStartToMapCenter={handleSetStartToMapCenter}
+        onSetStartToCurrentLocation={handleSetStartToCurrentLocation}
       />
 
       <PurposeSelector
@@ -441,6 +605,7 @@ export default function App() {
         routeStartLocation={routeStartLocation}
         walkingRoutePath={walkingRoutePath}
         walkingRouteSegments={walkingRouteSegments}
+        onMapCenterChange={handleMapCenterChange}
       />
 
       <RouteDirectionsPanel

@@ -12,6 +12,7 @@ import {
   Popup,
   TileLayer,
   useMap,
+  useMapEvents,
 } from "react-leaflet";
 import type { Location, Pin, PinCategory } from "../types";
 import type { WalkingRouteSegment } from "../utils/walkingRoute";
@@ -24,6 +25,7 @@ type MapViewProps = {
   routeStartLocation: Location;
   walkingRoutePath: [number, number][] | null;
   walkingRouteSegments: WalkingRouteSegment[];
+  onMapCenterChange: (center: Location) => void;
 };
 
 const CATEGORY_INFO: Record<
@@ -359,6 +361,34 @@ function MapCenterUpdater({ center }: { center: Location }) {
   return null;
 }
 
+function MapCenterTracker({
+  onMapCenterChange,
+}: {
+  onMapCenterChange: (center: Location) => void;
+}) {
+  const map = useMapEvents({
+    moveend: () => {
+      const center = map.getCenter();
+
+      onMapCenterChange({
+        lat: center.lat,
+        lng: center.lng,
+      });
+    },
+  });
+
+  useEffect(() => {
+    const center = map.getCenter();
+
+    onMapCenterChange({
+      lat: center.lat,
+      lng: center.lng,
+    });
+  }, [map, onMapCenterChange]);
+
+  return null;
+}
+
 export default function MapView({
   pins,
   routePins,
@@ -367,6 +397,7 @@ export default function MapView({
   routeStartLocation,
   walkingRoutePath,
   walkingRouteSegments,
+  onMapCenterChange,
 }: MapViewProps) {
   const straightRoutePath: [number, number][] = [
     [routeStartLocation.lat, routeStartLocation.lng],
@@ -407,6 +438,7 @@ export default function MapView({
       }}
     >
       <MapCenterUpdater center={center} />
+      <MapCenterTracker onMapCenterChange={onMapCenterChange} />
 
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -422,7 +454,7 @@ export default function MapView({
           <Popup>
             <strong>현재 위치</strong>
             <br />
-            추천 루트의 시작 기준점입니다.
+            현재 GPS 위치입니다.
           </Popup>
         </Marker>
       )}
@@ -568,9 +600,7 @@ export default function MapView({
         <Popup>
           <strong>출발 지점</strong>
           <br />
-          {userLocation
-            ? "현재 위치 기준으로 추천 루트를 시작합니다."
-            : "기본 위치 기준으로 추천 루트를 시작합니다."}
+          추천 루트의 시작 기준점입니다.
         </Popup>
       </Marker>
 
